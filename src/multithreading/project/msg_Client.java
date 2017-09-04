@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 
 /**
- * A simple client/server application in java that utilizes the multithreading library
+ * A simple client/server application in java 
  * Used TCP/IP protocol to program sockets
  * 
  * Created by: Calum Bruton
@@ -20,8 +20,16 @@ public class msg_Client extends javax.swing.JFrame {
      * Creates new form msg_Client
      */
 
+    static Socket MyClient;
+    static int total_cli_num = 0;
+    
+    int cli_num = 1;
+    
+    //Constructor
     public msg_Client() {
         initComponents();
+        total_cli_num++;
+        cli_num += total_cli_num;
     }
 
     /**
@@ -44,9 +52,15 @@ public class msg_Client extends javax.swing.JFrame {
         msg_area.setRows(5);
         jScrollPane1.setViewportView(msg_area);
 
-        msg_field.setText("jTextField1");
+        msg_field.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
+        msg_field.setToolTipText("");
 
         msg_send.setText("jButton1");
+        msg_send.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                msg_sendActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -76,6 +90,21 @@ public class msg_Client extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void msg_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msg_sendActionPerformed
+        try{
+            //When the button is pressed get the text in the text field
+            String msg = msg_field.getText();
+
+             //Now pass the msg to the server
+             PrintStream p = new PrintStream(MyClient.getOutputStream());
+             p.println(msg);
+        }
+        catch (IOException e) {
+            System.out.println(e);
+        } 
+
+    }//GEN-LAST:event_msg_sendActionPerformed
 
     /**
      * @param args the command line arguments
@@ -107,40 +136,38 @@ public class msg_Client extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new msg_Client().setVisible(true);
+                msg_Client msg_cli = new msg_Client();
+                msg_cli.setVisible(true);
+                msg_cli.setTitle("Client " + msg_cli.cli_num);
             }
         });
-        
     
         //Try to open a client socket on port 9999
-        Socket MyClient;
         try {
-           MyClient = new Socket("localhost", 9999);
-           Scanner sc = new Scanner(System.in);
-           Scanner sc1 = new Scanner(MyClient.getInputStream());
-           System.out.println("Enter a message: ");
-           String msg = sc.nextLine();
-           
-           //Now pass the number to the server
-           PrintStream p = new PrintStream(MyClient.getOutputStream());
-           p.println(msg);
-           
-           //To accept the answer from the server use sc1 Scanner
-           String reply = sc1.nextLine();
-           msg_area.setText(msg_area.getText()+reply+"\n");
-           
+            MyClient = new Socket("localhost", 9999);
+            Scanner sc = new Scanner(MyClient.getInputStream());
+            String reply = "";
+            while(!reply.equals("exit")){
+
+                //To accept the answer from the server use sc Scanner
+                reply = sc.nextLine();
+                msg_area.setText(msg_area.getText()+reply+"\n");
+            } 
         }
+                 
         catch (IOException e) {
             System.out.println(e);
         } 
         
         
-    }
+    } //End of main
 
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JTextArea msg_area;
-    private javax.swing.JTextField msg_field;
+    private static javax.swing.JTextField msg_field;
     private javax.swing.JButton msg_send;
     // End of variables declaration//GEN-END:variables
 }

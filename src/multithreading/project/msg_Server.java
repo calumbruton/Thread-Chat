@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
+
 /**
  * Created by Calum Bruton 
  * The message Server is the GUI for the chat room application
@@ -38,8 +39,6 @@ public class msg_Server extends javax.swing.JFrame {
         msg_area.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
         msg_area.setRows(5);
         jScrollPane1.setViewportView(msg_area);
-
-        msg_input.setText("jTextField1");
 
         msg_send.setText("jButton1");
 
@@ -102,7 +101,9 @@ public class msg_Server extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new msg_Server().setVisible(true);
+                msg_Server msg_svr = new msg_Server();
+                msg_svr.setVisible(true);
+                msg_svr.setTitle("Server");
             }
         });
         //Try to open a server socket on port 9999
@@ -123,33 +124,23 @@ public class msg_Server extends javax.swing.JFrame {
                 Socket clientSocket = MyServer.accept();
 
                 //For each client, we will start a thread to service their requests
-                //ClientThread cliThread = new ClientThread(clientSocket);
-                //cliThread.start();
-                
-
-                //Create a scanner that waits for the connected client socket
-                Scanner scanner = new Scanner(clientSocket.getInputStream());
-                String msg = scanner.nextLine();
-             
-                //update the message area with the message from the client
-                msg_area.setText(msg_area.getText()+ msg + "\n");
-                
-                //Send inf
-                PrintStream p = new PrintStream(clientSocket.getOutputStream());
-                p.println("Server: Hello Client");
-
+                ClientThread cliThread = new ClientThread(clientSocket);
+                cliThread.start();
             }
+            
             catch (IOException e) {
                System.out.println(e);
             }  
+            //Increase the count of threads being serviced
             numberOfThreads += 1;
         }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private static javax.swing.JTextArea msg_area;
+    protected static javax.swing.JTextArea msg_area;
     private javax.swing.JTextField msg_input;
     private javax.swing.JButton msg_send;
     // End of variables declaration//GEN-END:variables
-}
+}//End of message server class
+
