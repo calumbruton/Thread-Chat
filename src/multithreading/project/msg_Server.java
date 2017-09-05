@@ -126,6 +126,7 @@ public class msg_Server extends javax.swing.JFrame {
                 //For each client, we will start a thread to service their requests
                 ClientThread cliThread = new ClientThread(clientSocket);
                 cliThread.start();
+                
             }
             
             catch (IOException e) {

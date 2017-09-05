@@ -20,16 +20,16 @@ public class msg_Client extends javax.swing.JFrame {
      * Creates new form msg_Client
      */
 
-    static Socket MyClient;
+    Socket MyClient;
     static int total_cli_num = 0;
     
-    int cli_num = 1;
+    int cli_num;
     
     //Constructor
     public msg_Client() {
         initComponents();
         total_cli_num++;
-        cli_num += total_cli_num;
+        cli_num = total_cli_num;
     }
 
     /**
@@ -49,6 +49,7 @@ public class msg_Client extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         msg_area.setColumns(20);
+        msg_area.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
         msg_area.setRows(5);
         jScrollPane1.setViewportView(msg_area);
 
@@ -91,6 +92,7 @@ public class msg_Client extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //BUTTON ACTION
     private void msg_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msg_sendActionPerformed
         try{
             //When the button is pressed get the text in the text field
@@ -107,9 +109,10 @@ public class msg_Client extends javax.swing.JFrame {
     }//GEN-LAST:event_msg_sendActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Run the client from this method with the parameters of the client
+     * and the port number on which you would like the client to run
      */
-    public static void main(String args[]) {
+    public void run_client(msg_Client msg_cli) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -133,25 +136,32 @@ public class msg_Client extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+        try {
+            msg_cli.MyClient = new Socket("localhost", 9999);
+             }          
+        catch (IOException e) {
+            System.out.println(e);
+        } 
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                msg_Client msg_cli = new msg_Client();
                 msg_cli.setVisible(true);
                 msg_cli.setTitle("Client " + msg_cli.cli_num);
             }
         });
     
-        //Try to open a client socket on port 9999
+        //Show reply's from the server until the reply is exit
         try {
-            MyClient = new Socket("localhost", 9999);
-            Scanner sc = new Scanner(MyClient.getInputStream());
+            Scanner sc = new Scanner(msg_cli.MyClient.getInputStream());
             String reply = "";
             while(!reply.equals("exit")){
 
                 //To accept the answer from the server use sc Scanner
                 reply = sc.nextLine();
-                msg_area.setText(msg_area.getText()+reply+"\n");
+                msg_cli.msg_area.setText(msg_cli.msg_area.getText()+reply+"\n");
+                System.out.println("Reply to thread: " + msg_cli.cli_num);
             } 
         }
                  
@@ -160,14 +170,14 @@ public class msg_Client extends javax.swing.JFrame {
         } 
         
         
-    } //End of main
+    } //End of run_client
 
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private static javax.swing.JTextArea msg_area;
-    private static javax.swing.JTextField msg_field;
+    private javax.swing.JTextArea msg_area;
+    private javax.swing.JTextField msg_field;
     private javax.swing.JButton msg_send;
     // End of variables declaration//GEN-END:variables
 }
