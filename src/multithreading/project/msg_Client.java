@@ -137,7 +137,7 @@ public class msg_Client extends javax.swing.JFrame {
         //</editor-fold>
 
         try {
-            msg_cli.MyClient = new Socket("localhost", 9999);
+            MyClient = new Socket("localhost", 9999);
              }          
         catch (IOException e) {
             System.out.println(e);
@@ -148,20 +148,20 @@ public class msg_Client extends javax.swing.JFrame {
             @Override
             public void run() {
                 msg_cli.setVisible(true);
-                msg_cli.setTitle("Client " + msg_cli.cli_num);
+                msg_cli.setTitle("Client " + cli_num);
             }
         });
     
         //Show reply's from the server until the reply is exit
         try {
-            Scanner sc = new Scanner(msg_cli.MyClient.getInputStream());
+            Scanner sc = new Scanner(MyClient.getInputStream());
             String reply = "";
             while(!reply.equals("exit")){
 
                 //To accept the answer from the server use sc Scanner
                 reply = sc.nextLine();
-                msg_cli.msg_area.setText(msg_cli.msg_area.getText()+reply+"\n");
-                System.out.println("Reply to thread: " + msg_cli.cli_num);
+                msg_area.setText(msg_area.getText()+reply+"\n");
+                System.out.println("Reply to thread: " + cli_num);
             } 
         }
                  

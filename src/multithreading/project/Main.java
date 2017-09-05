@@ -16,7 +16,7 @@ public class Main {
         
     }
    
-    public static void main(String args[]) {
+    public static void main(String args[]) throws InterruptedException {
         Thread thread1 = new Thread() {
             public void run() {
                 run_server();
@@ -37,10 +37,20 @@ public class Main {
                 msg_cli2.run_client(msg_cli2);
             }
         };
+        
+        Thread thread4 = new Thread() {
+            public void run() {
+                msg_Client msg_cli3 = new msg_Client();
+                msg_cli3.run_client(msg_cli3);
+            }
+        };
 
         thread1.start();
+        Thread.sleep(3000); //Sleeping the main function ensures the correct thread starting order
         thread2.start();
+        Thread.sleep(3000);
         thread3.start();
-              
+        Thread.sleep(3000);
+        thread4.start();              
     }
 }

@@ -118,10 +118,11 @@ public class msg_Server extends javax.swing.JFrame {
         }  
         
         //Succesfully created server socket. Now wait for connections
-        while (numberOfThreads < 5){
+        while (numberOfThreads < 20){
             try{
                 //The accept method waits until it receives a connection from a client
                 Socket clientSocket = MyServer.accept();
+                System.out.println("Thread " +numberOfThreads + " started on: " + clientSocket);
 
                 //For each client, we will start a thread to service their requests
                 ClientThread cliThread = new ClientThread(clientSocket);
