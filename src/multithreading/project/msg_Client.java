@@ -56,7 +56,7 @@ public class msg_Client extends javax.swing.JFrame {
         msg_field.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
         msg_field.setToolTipText("");
 
-        msg_send.setText("jButton1");
+        msg_send.setText("Send");
         msg_send.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 msg_sendActionPerformed(evt);

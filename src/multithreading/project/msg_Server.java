@@ -3,7 +3,11 @@ package multithreading.project;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 
 
 /**
@@ -12,9 +16,9 @@ import java.util.Scanner;
  */
 public class msg_Server extends javax.swing.JFrame {
 
-    /**
-     * Creates new form msg_Server
-     */
+    //This hashmap stores the username socket pairs of clients
+    static HashMap clients_map = new HashMap(); 
+    
     public msg_Server() {
         initComponents();
     }
@@ -32,15 +36,40 @@ public class msg_Server extends javax.swing.JFrame {
         msg_area = new javax.swing.JTextArea();
         msg_input = new javax.swing.JTextField();
         msg_send = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        client_list = new javax.swing.JList<>();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         msg_area.setColumns(20);
         msg_area.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
         msg_area.setRows(5);
+        msg_area.setFocusable(false);
         jScrollPane1.setViewportView(msg_area);
 
-        msg_send.setText("jButton1");
+        msg_input.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
+        msg_input.setSelectionColor(new java.awt.Color(255, 153, 0));
+
+        msg_send.setText("Send");
+        msg_send.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                msg_sendActionPerformed(evt);
+            }
+        });
+
+        DefaultListModel model = new DefaultListModel();
+        client_list.setModel(model);
+        client_list.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        client_list.setToolTipText("");
+        client_list.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        client_list.setSelectionBackground(new java.awt.Color(255, 178, 84));
+        jScrollPane3.setViewportView(client_list);
+
+        jLabel1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 153, 0));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Choose Your Recipient");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -50,17 +79,29 @@ public class msg_Server extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(msg_input, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(msg_send, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(msg_input))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(msg_send, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(msg_input)
@@ -70,6 +111,22 @@ public class msg_Server extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    
+    //Action performed when the send button is pressed
+    private void msg_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msg_sendActionPerformed
+        //Find the currently selected Client in the client list and send a message to that client
+        String recipient = client_list.getSelectedValue();
+        Socket cli_socket = (Socket) clients_map.get(recipient);
+        try {
+            PrintStream p = new PrintStream(cli_socket.getOutputStream());
+            String msg = msg_input.getText();
+            p.println(msg);
+        } 
+        catch (IOException ex) {
+            Logger.getLogger(msg_Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_msg_sendActionPerformed
 
     /**
      * @param args the command line arguments
@@ -109,7 +166,7 @@ public class msg_Server extends javax.swing.JFrame {
         //Try to open a server socket on port 9999
         //Note that you cannot choose a port less than 1023 if you are not a privledged user
         ServerSocket MyServer = null;
-        int numberOfThreads = 0; //initialize a thread counter
+        int num_threads = 0; //initialize a thread counter
         try{
             MyServer = new ServerSocket(9999);
         }
@@ -118,14 +175,22 @@ public class msg_Server extends javax.swing.JFrame {
         }  
         
         //Succesfully created server socket. Now wait for connections
-        while (numberOfThreads < 20){
+        while (num_threads <= 10){
             try{
                 //The accept method waits until it receives a connection from a client
                 Socket clientSocket = MyServer.accept();
-                System.out.println("Thread " +numberOfThreads + " started on: " + clientSocket);
+                System.out.println("Thread " + (num_threads+1) + " started on: " + clientSocket);
+                String cli_name = "Client " + (num_threads+1);
+                
+                //Add the client name and socket to the clients map
+                clients_map.put(cli_name, clientSocket);
+                
+                //Add client name to the client_list to select on the server
+                DefaultListModel model = (DefaultListModel)client_list.getModel();
+                model.addElement(cli_name);
 
                 //For each client, we will start a thread to service their requests
-                ClientThread cliThread = new ClientThread(clientSocket);
+                ClientThread cliThread = new ClientThread(cli_name, clientSocket);
                 cliThread.start();
                 
             }
@@ -134,12 +199,15 @@ public class msg_Server extends javax.swing.JFrame {
                System.out.println(e);
             }  
             //Increase the count of threads being serviced
-            numberOfThreads += 1;
+            num_threads += 1;
         }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private static javax.swing.JList<String> client_list;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
     protected static javax.swing.JTextArea msg_area;
     private javax.swing.JTextField msg_input;
     private javax.swing.JButton msg_send;
