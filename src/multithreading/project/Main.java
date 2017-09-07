@@ -44,9 +44,10 @@ public class Main {
                 msg_cli3.run_client(msg_cli3);
             }
         };
-
-        thread1.start();
+        
         Thread.sleep(3000); //Sleeping the main function ensures the correct thread starting order
+        thread1.start();
+        Thread.sleep(3000); 
         thread2.start();
         Thread.sleep(3000);
         thread3.start();

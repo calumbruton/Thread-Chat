@@ -3,6 +3,7 @@ package multithreading.project;
 
 //imports
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
@@ -25,14 +26,19 @@ public class msg_Server extends javax.swing.JFrame {
     static HashMap clients_map = new HashMap(); 
     
     //Colors used
-    Color orange_col = Color.decode("0xFF9900");
-    Color back_col = Color.decode("0xd9dadb");
+    Color prim_col = Color.decode("0x63f27b");
+    Color back_col = Color.decode("0xeaf7f9");
     
     public msg_Server() {
         initComponents();
+        
+        //Manual changes to swing components
         this.setTitle("Server");
         this.getContentPane().setBackground(back_col);
-        msg_input.setBorder(new EmptyBorder(10,5,5,5));
+        recipient_label.setForeground(Color.decode("0x76767a"));
+        client_list.setSelectionBackground(prim_col);
+        
+        msg_input.setBorder(new EmptyBorder(5,15,5,5));
     }
 
     /**
@@ -50,20 +56,21 @@ public class msg_Server extends javax.swing.JFrame {
         msg_send = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         client_list = new javax.swing.JList<>();
-        jLabel1 = new javax.swing.JLabel();
+        recipient_label = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(51, 51, 51));
 
         msg_area.setColumns(20);
         msg_area.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
+        msg_area.setForeground(new java.awt.Color(51, 51, 51));
         msg_area.setRows(5);
         msg_area.setFocusable(false);
         msg_area.setSelectionColor(new java.awt.Color(204, 153, 0));
         jScrollPane1.setViewportView(msg_area);
 
         msg_input.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
-        msg_input.setForeground(new java.awt.Color(102, 102, 102));
+        msg_input.setForeground(new java.awt.Color(51, 51, 51));
         msg_input.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         msg_input.setSelectionColor(new java.awt.Color(255, 153, 0));
         msg_input.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -72,6 +79,11 @@ public class msg_Server extends javax.swing.JFrame {
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 msg_inputFocusLost(evt);
+            }
+        });
+        msg_input.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                msg_inputKeyPressed(evt);
             }
         });
 
@@ -90,10 +102,10 @@ public class msg_Server extends javax.swing.JFrame {
         client_list.setSelectionBackground(new java.awt.Color(255, 178, 84));
         jScrollPane3.setViewportView(client_list);
 
-        jLabel1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 153, 0));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Choose Your Recipient");
+        recipient_label.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        recipient_label.setForeground(new java.awt.Color(255, 153, 0));
+        recipient_label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        recipient_label.setText("Choose Your Recipient");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -108,7 +120,7 @@ public class msg_Server extends javax.swing.JFrame {
                     .addComponent(msg_input))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                    .addComponent(recipient_label, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,7 +135,7 @@ public class msg_Server extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(recipient_label, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -146,7 +158,10 @@ public class msg_Server extends javax.swing.JFrame {
             PrintStream p = new PrintStream(cli_socket.getOutputStream());
             String msg = msg_input.getText();
             p.println(msg);
-        } 
+            
+            //Reset the input field
+            msg_input.setText("");
+        }              
         catch (IOException ex) {
             Logger.getLogger(msg_Server.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -154,15 +169,35 @@ public class msg_Server extends javax.swing.JFrame {
 
     //When the message input area is focussed
     private void msg_inputFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_msg_inputFocusGained
-        Border border = BorderFactory.createLineBorder(orange_col);
+        Border border = BorderFactory.createLineBorder(prim_col);
         msg_input.setBorder(BorderFactory.createCompoundBorder(border, 
-            BorderFactory.createEmptyBorder(10, 5, 5, 5)));
+            BorderFactory.createEmptyBorder(5, 15, 5, 5)));
     }//GEN-LAST:event_msg_inputFocusGained
 
     //When the message input area losses focus
     private void msg_inputFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_msg_inputFocusLost
-        msg_input.setBorder(new EmptyBorder(10,5,5,5));
+        msg_input.setBorder(new EmptyBorder(5,15,5,5));
     }//GEN-LAST:event_msg_inputFocusLost
+
+    private void msg_inputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_msg_inputKeyPressed
+        //If the key is enter then send the message to the server
+        if (evt.getKeyCode()==KeyEvent.VK_ENTER){
+            //Find the currently selected Client in the client list and send a message to that client
+            String recipient = client_list.getSelectedValue();
+            Socket cli_socket = (Socket) clients_map.get(recipient);
+            try {
+                PrintStream p = new PrintStream(cli_socket.getOutputStream());
+                String msg = msg_input.getText();
+                p.println(msg);
+
+                //Reset the input field
+                msg_input.setText("");
+            }              
+            catch (IOException ex) {
+                Logger.getLogger(msg_Server.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
+    }//GEN-LAST:event_msg_inputKeyPressed
 
 
     
@@ -240,12 +275,12 @@ public class msg_Server extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static javax.swing.JList<String> client_list;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     protected static javax.swing.JTextArea msg_area;
     private javax.swing.JTextField msg_input;
     private javax.swing.JButton msg_send;
+    private javax.swing.JLabel recipient_label;
     // End of variables declaration//GEN-END:variables
 }//End of message server class
 

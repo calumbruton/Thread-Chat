@@ -1,5 +1,6 @@
 /*
- * A Client Thread
+ * A Client Thread is called by the server to handle each connected client on
+ * the server. This allows for concurrent handling
  */
 
 package multithreading.project;

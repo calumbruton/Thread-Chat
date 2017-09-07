@@ -1,14 +1,19 @@
 
 package multithreading.project;
 
+import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 
 /**
- * A simple client/server application in java 
- * Used TCP/IP protocol to program sockets
+ * The Client Class creates a GUI and attempts to connect to 
+ * the local server on port 9999
  * 
  * Created by: Calum Bruton
  * Version 1: June 11 2017
@@ -16,18 +21,24 @@ import java.util.Scanner;
 
 public class msg_Client extends javax.swing.JFrame {
 
-    /**
-     * Creates new form msg_Client
-     */
-
     Socket MyClient;
     static int total_cli_num = 0;
     
     int cli_num;
     
+    //Colors used
+    Color purple_col = Color.decode("0xa3de5");
+    Color back_col = Color.decode("0xe9dcf4");
+    
     //Constructor
     public msg_Client() {
         initComponents();
+        
+        //Manually set border and background
+        msg_input.setBorder(new EmptyBorder(5,15,5,5));
+        this.getContentPane().setBackground(back_col);
+        
+        //Increment the Client number
         total_cli_num++;
         cli_num = total_cli_num;
     }
@@ -43,18 +54,34 @@ public class msg_Client extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         msg_area = new javax.swing.JTextArea();
-        msg_field = new javax.swing.JTextField();
+        msg_input = new javax.swing.JTextField();
         msg_send = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         msg_area.setColumns(20);
         msg_area.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
+        msg_area.setForeground(new java.awt.Color(51, 51, 51));
         msg_area.setRows(5);
+        msg_area.setFocusable(false);
         jScrollPane1.setViewportView(msg_area);
 
-        msg_field.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
-        msg_field.setToolTipText("");
+        msg_input.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
+        msg_input.setForeground(new java.awt.Color(51, 51, 51));
+        msg_input.setToolTipText("");
+        msg_input.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                msg_inputFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                msg_inputFocusLost(evt);
+            }
+        });
+        msg_input.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                msg_inputKeyPressed(evt);
+            }
+        });
 
         msg_send.setText("Send");
         msg_send.addActionListener(new java.awt.event.ActionListener() {
@@ -71,7 +98,7 @@ public class msg_Client extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(msg_field, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(msg_input, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(msg_send, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE))
                     .addComponent(jScrollPane1))
@@ -84,7 +111,7 @@ public class msg_Client extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(msg_field)
+                    .addComponent(msg_input)
                     .addComponent(msg_send, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -96,17 +123,51 @@ public class msg_Client extends javax.swing.JFrame {
     private void msg_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msg_sendActionPerformed
         try{
             //When the button is pressed get the text in the text field
-            String msg = msg_field.getText();
+            String msg = msg_input.getText();
 
              //Now pass the msg to the server
              PrintStream p = new PrintStream(MyClient.getOutputStream());
              p.println(msg);
+             
+            //Reset the input field
+            msg_input.setText("");
         }
         catch (IOException e) {
             System.out.println(e);
         } 
 
     }//GEN-LAST:event_msg_sendActionPerformed
+
+    private void msg_inputFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_msg_inputFocusGained
+        Border border = BorderFactory.createLineBorder(purple_col);
+        msg_input.setBorder(BorderFactory.createCompoundBorder(border, 
+            BorderFactory.createEmptyBorder(5, 15, 5, 5)));
+    }//GEN-LAST:event_msg_inputFocusGained
+
+    private void msg_inputFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_msg_inputFocusLost
+        msg_input.setBorder(new EmptyBorder(5,15,5,5));
+    }//GEN-LAST:event_msg_inputFocusLost
+
+    //When a key is pressed while on the input field
+    private void msg_inputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_msg_inputKeyPressed
+        //If the key is enter then send the message to the server
+        if (evt.getKeyCode()==KeyEvent.VK_ENTER){
+            try{
+                //When the button is pressed get the text in the text field
+                String msg = msg_input.getText();
+
+                 //Now pass the msg to the server
+                 PrintStream p = new PrintStream(MyClient.getOutputStream());
+                 p.println(msg);
+                 
+                //Reset the input field
+                msg_input.setText("");
+            }
+            catch (IOException e) {
+                System.out.println(e);
+            } 
+        }
+    }//GEN-LAST:event_msg_inputKeyPressed
 
     /**
      * Run the client from this method with the parameters of the client
@@ -160,7 +221,7 @@ public class msg_Client extends javax.swing.JFrame {
 
                 //To accept the answer from the server use sc Scanner
                 reply = sc.nextLine();
-                msg_area.setText(msg_area.getText()+reply+"\n");
+                msg_area.setText(msg_area.getText() + "Server: " +reply+"\n");
                 System.out.println("Reply to thread: " + cli_num);
             } 
         }
@@ -169,6 +230,7 @@ public class msg_Client extends javax.swing.JFrame {
             System.out.println(e);
         } 
         
+        msg_area.setText(msg_area.getText() + "Server: Connection terminated");
         
     } //End of run_client
 
@@ -177,7 +239,7 @@ public class msg_Client extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea msg_area;
-    private javax.swing.JTextField msg_field;
+    private javax.swing.JTextField msg_input;
     private javax.swing.JButton msg_send;
     // End of variables declaration//GEN-END:variables
 }
