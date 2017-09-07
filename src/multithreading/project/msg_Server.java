@@ -1,13 +1,18 @@
 
 package multithreading.project;
 
+//imports
+import java.awt.Color;
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 
 /**
@@ -16,11 +21,18 @@ import javax.swing.DefaultListModel;
  */
 public class msg_Server extends javax.swing.JFrame {
 
-    //This hashmap stores the username socket pairs of clients
+    //This hashmap stores the username-socket pairs of clients
     static HashMap clients_map = new HashMap(); 
+    
+    //Colors used
+    Color orange_col = Color.decode("0xFF9900");
+    Color back_col = Color.decode("0xd9dadb");
     
     public msg_Server() {
         initComponents();
+        this.setTitle("Server");
+        this.getContentPane().setBackground(back_col);
+        msg_input.setBorder(new EmptyBorder(10,5,5,5));
     }
 
     /**
@@ -41,15 +53,27 @@ public class msg_Server extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(51, 51, 51));
 
         msg_area.setColumns(20);
         msg_area.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
         msg_area.setRows(5);
         msg_area.setFocusable(false);
+        msg_area.setSelectionColor(new java.awt.Color(204, 153, 0));
         jScrollPane1.setViewportView(msg_area);
 
         msg_input.setFont(new java.awt.Font("Roboto", 0, 13)); // NOI18N
+        msg_input.setForeground(new java.awt.Color(102, 102, 102));
+        msg_input.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         msg_input.setSelectionColor(new java.awt.Color(255, 153, 0));
+        msg_input.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                msg_inputFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                msg_inputFocusLost(evt);
+            }
+        });
 
         msg_send.setText("Send");
         msg_send.addActionListener(new java.awt.event.ActionListener() {
@@ -128,9 +152,21 @@ public class msg_Server extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_msg_sendActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    //When the message input area is focussed
+    private void msg_inputFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_msg_inputFocusGained
+        Border border = BorderFactory.createLineBorder(orange_col);
+        msg_input.setBorder(BorderFactory.createCompoundBorder(border, 
+            BorderFactory.createEmptyBorder(10, 5, 5, 5)));
+    }//GEN-LAST:event_msg_inputFocusGained
+
+    //When the message input area losses focus
+    private void msg_inputFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_msg_inputFocusLost
+        msg_input.setBorder(new EmptyBorder(10,5,5,5));
+    }//GEN-LAST:event_msg_inputFocusLost
+
+
+    
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -160,7 +196,6 @@ public class msg_Server extends javax.swing.JFrame {
             public void run() {
                 msg_Server msg_svr = new msg_Server();
                 msg_svr.setVisible(true);
-                msg_svr.setTitle("Server");
             }
         });
         //Try to open a server socket on port 9999

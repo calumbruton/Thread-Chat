@@ -5,7 +5,7 @@ package multithreading.project;
 
 /**
  * The main method will open a server and run multiple clients on separate threads
- * for the user to work with
+ * for the user to communicate with the server through
  */
 public class Main {
     
