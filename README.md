@@ -11,3 +11,5 @@ accepted by the server it has the ability to reply to any specific client thread
 by selecting their username on the right hand side of the GUI.
 
 Run the main file to start the program
+
+![thread-chat-image](https://user-images.githubusercontent.com/12948431/30145949-1f34a0fe-9363-11e7-8a99-20357e1a93b5.jpg)
